@@ -1,0 +1,669 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="/jquery-easyui-1.4.5/themes/bootstrap/easyui.css" >
+<link rel="stylesheet" type="text/css" href="/jquery-easyui-1.4.5/themes/icon.css" >
+<script type="text/javascript" src="/jquery-easyui-1.4.5/jquery.min.js"></script>
+<script type="text/javascript" src="/jquery-easyui-1.4.5/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="/jquery-easyui-1.4.5/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="/jquery-easyui-1.4.5/datagrid-detailview.js"></script>
+<script type="text/javascript" src="/commons/commons.js"></script>
+<script type="text/javascript" src="/commons/easyui-extension.js"></script>
+
+<title>健康档案</title>
+</head>
+
+<body class="easyui-layout" >   
+	  
+		<div data-options="region:'north',title:'查询条件',split:false" style="height:100px;padding:10px;">
+			<form id="searchForm">
+				<table style="font-size:10px;">
+					<tr>
+						<td>userid</td>
+						<td>
+						<input type="text" id="userid" name="userid" class="easyui-validatebox" data-options="required:true"/>
+						
+						<input type="text" hidden="hidden" id="orgcode" name="orgcode" value="PAJK_CD" />
+						<input type="text" hidden="hidden" id="doctype" name="doctype" value="health_person" />
+						<input type="text" hidden="hidden" id="senderSystem" name="senderSystem" value="PAJK_CD" />
+						<input type="text" hidden="hidden" id="senderApplication" name="senderApplication" value="CD_APP" />
+						<input type="checkbox" id="full" name="Full" checked="checked"/>
+						</td>
+						
+						
+						<td align="right">
+							<a id="btn" href="#" onclick="searchFun();" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a>
+							<a id="btn" href="#" onclick="clearFun();" class="easyui-linkbutton" data-options="iconCls:'icon-search'">清空</a>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>   
+      <div id="hpdg_toolbar">
+      		<table>
+      			<tr>
+    				<td>
+      					<a id="btn" href="#" onclick="insertFun();" class="easyui-linkbutton" data-options="iconCls:'icon-add'">新增用户</a>
+      				</td>
+      				<td>
+      				<div class="datagrid-btn-separator"></div>
+      				</td>
+    				<td>
+      					<a id="btn" href="#" onclick="editFun();" class="easyui-linkbutton" data-options="iconCls:'icon-edit'">更新用户</a>
+      				</td>
+      				<td>
+      			</tr>
+      		</table>
+      	</div>
+	    <div data-options="region:'center',title:''" style="padding:1px;background:#eee;">
+	    	
+	    	<div id="dataTab" class="easyui-tabs" data-options="fit:true">   
+			    <div id="healthPerson" title="用户档案信息" style="padding:5px">   
+			        <table id="hpdg"></table>  
+			    </div>
+			    <div id="getSlaveUsers" title="用户关联关系" style="padding:5px;">
+		            <table id="gsudg"></table>
+		        </div>
+			    <div id="healthPhyExamProfile" title="体检报告" style="padding:5px">   
+			        <table id="hpepdg"></table>  
+			    </div> 
+			    <div id="healthVisitingProfile" title="上门检测报告" style="padding:5px">   
+			        <table id="hvpdg"></table>  
+			    </div>
+			    <div id="healthUserProfile" title="慢病用户信息" style="padding:5px">   
+			        <table id="hupdg"></table>  
+			    </div>  
+			    <div id="healthGeneProfile" title="基因检测报告" style="padding:5px">   
+			        <table id="hgpdg"></table>  
+			    </div>  
+			     <div id="healthConsultOnline" title="问诊记录" style="padding:5px">   
+			        <table id="hcodg"></table>  
+			    </div>
+			     <div id="healthRegisterProfile" title="挂号记录" style="padding:5px">   
+			        <table id="hrpdg"></table>  
+			    </div>
+			     <div id="healthDiagnosesRecipeProfile" title="诊断与处方" style="padding:5px">   
+			        <table id="hdrpdg"></table>  
+			    </div> 
+			</div> 
+	    </div> 
+		<script type="text/javascript">
+			var hpdg;
+			var gsudg;
+			var hpepdg;
+			var hvpdg;
+			var hupdg;
+			var hgpdg;
+			var hcodg;
+			var hrpdg;
+			var hdrpdg;
+			$(function(){
+				hpdg=$('#hpdg').propertygrid({
+					 url:'/healthRecord/findHealthPerson',
+		             showGroup:false,
+		             scrollbarSize:0,
+		             columns:[[
+		                       {field:'name',title:'属性',width:20},
+		                       {field:'value',title:'值',width:100,resizable:false}
+		                     ]],
+		             toolbar: '#hpdg_toolbar'
+	            });
+				gsudg=$('#gsudg').datagrid({ 
+					fitColumns:true,
+					idField:'userid', 
+					rownumbers : true,
+				    url:'/healthRecord/getSlaveUsers',  				   
+				    pagination : true,  
+				    sortName : 'userid',
+					sortOrder : 'desc',
+					checkOnSelect:false,
+					selectOnCheck:false,
+					pageSize : 10,
+					pageList : [ 10, 20, 30, 40, 50, 100, 200, 300, 400, 500 ], 
+				    columns:[[ 
+						{field:'userId',title:'userId',width:50},
+				        {field:'personId',title:'personId',width:200},    
+				        {field:'orgCode',title:'orgCode',width:50},
+				        {field:'created',title:'created',width:50},
+				        {field:'userName',title:'userName',width:50},
+				        {field:'refCode',title:'refcode',align:'center',width:50,styler: function(value,row,index){
+										if(value=='unLink'){
+											return 'background-color:#FF9933;color:white;';
+										}else{
+											return 'background-color:#0099FF;color:white;';
+										}
+										
+									}
+				        },
+				        
+				        {field:'sexCode',title:'sexCode',width:50},
+				        {field:'dob',title:'dob',width:100},
+				        {field:'bloodType',title:'bloodType',width:50},
+				        {field:'address1',title:'address',width:200},
+				        {field:'action',title:'操作',width:50,formatter:function(value,row,index){
+					        	if(row.refCode=='unLink'){
+					        		return '<a style="cursor:pointer" onclick="updateRelation('+row.userId+',1);"><font color="blue">添加关联</font></a>';
+					        	}else{
+					        		return '<a style="cursor:pointer" onclick="updateRelation('+row.userId+',0);"><font color="blue">解除关联</font></a>';
+					        	}
+				        	}
+				        }    
+				    ]]
+				   
+				});
+				hpepdg=$('#hpepdg').datagrid({ 
+					fitColumns:true,
+					idField:'userid', 
+					rownumbers : true,
+				    url:'/healthRecord/findProfile',  				   
+				    pagination : true,  
+				    sortName : 'userid',
+					sortOrder : 'desc',
+					checkOnSelect:false,
+					selectOnCheck:false,
+					pageSize : 10,
+					pageList : [ 10, 20, 30, 40, 50, 100, 200, 300, 400, 500 ], 
+				    columns:[[    
+				        {field:'personId',title:'personId',width:100},    
+				        {field:'orgCode',title:'orgCode',width:30},
+				        {field:'created',title:'created',width:50},
+				        {field:'userId',title:'userId',width:50},
+				        {field:'values',title:'values',width:200,formatter:function(value,row,index){
+				        													if(value != undefined){
+				        														return '<span title="'+value+'">'+value+'</span>';
+				        													}
+															        	}
+				        },
+				        {field:'action',title:'操作',width:50,formatter:function(value,row,index){
+				        	var newStr = escape(row.values); 
+				        	var param = "\'"+newStr+"\'";
+			        		return '<a style="cursor:pointer" onclick="parseNote('+param+');">查看</a>';
+				        	}
+				        }    
+				    ]]
+				   
+				});
+				hvpdg=$('#hvpdg').datagrid({ 
+					fitColumns:true,
+					idField:'userid', 
+					rownumbers : true,
+				    url:'/healthRecord/findProfile',  				   
+				    pagination : true,  
+				    sortName : 'userid',
+					sortOrder : 'desc',
+					checkOnSelect:false,
+					selectOnCheck:false,
+					pageSize : 10,
+					pageList : [ 10, 20, 30, 40, 50, 100, 200, 300, 400, 500 ], 
+					columns:[[    
+						        {field:'personId',title:'personId',width:100},    
+						        {field:'orgCode',title:'orgCode',width:30},
+						        {field:'created',title:'created',width:50},
+						        {field:'userId',title:'userId',width:50},
+						        {field:'values',title:'values',width:200,formatter:function(value,row,index){
+						        													if(value != undefined){
+						        														return '<span title="'+value+'">'+value+'</span>';
+						        													}
+																	        	}
+						        },
+						        {field:'action',title:'操作',width:50,formatter:function(value,row,index){
+						        		
+						        		var newStr = escape(row.values); 
+							        	var param = "\'"+newStr+"\'";
+						        		return '<a style="cursor:pointer" onclick="parseNote('+param+');">查看</a>';
+						        	}
+						        }    
+						    ]]
+				   
+				});
+				hupdg=$('#hupdg').datagrid({ 
+					fitColumns:true,
+					idField:'userid', 
+					rownumbers : true,
+				    url:'/healthRecord/findProfile',  				   
+				    pagination : true,  
+				    sortName : 'userid',
+					sortOrder : 'desc',
+					checkOnSelect:false,
+					selectOnCheck:false,
+					pageSize : 10,
+					pageList : [ 10, 20, 30, 40, 50, 100, 200, 300, 400, 500 ], 
+					columns:[[    
+						        {field:'personId',title:'personId',width:100},    
+						        {field:'orgCode',title:'orgCode',width:30},
+						        {field:'created',title:'created',width:50},
+						        {field:'userId',title:'userId',width:50},
+						        {field:'values',title:'values',width:200,formatter:function(value,row,index){
+						        													if(value != undefined){
+						        														return '<span title="'+value+'">'+value+'</span>';
+						        													}
+																	        	}
+						        },
+						        {field:'action',title:'操作',width:50,formatter:function(value,row,index){
+						        	var newStr = escape(row.values); 
+						        	var param = "\'"+newStr+"\'";
+					        		return '<a style="cursor:pointer" onclick="parseNote('+param+');">查看</a>';
+						        	}
+						        }    
+						    ]]
+				   
+				});
+				hgpdg=$('#hgpdg').datagrid({ 
+					fitColumns:true,
+					idField:'userid', 
+					rownumbers : true,
+				    url:'/healthRecord/findProfile',  				   
+				    pagination : true,  
+				    sortName : 'userid',
+					sortOrder : 'desc',
+					checkOnSelect:false,
+					selectOnCheck:false,
+					pageSize : 10,
+					pageList : [ 10, 20, 30, 40, 50, 100, 200, 300, 400, 500 ], 
+					columns:[[    
+						        {field:'personId',title:'personId',width:100},    
+						        {field:'orgCode',title:'orgCode',width:30},
+						        {field:'created',title:'created',width:50},
+						        {field:'userId',title:'userId',width:50},
+						        {field:'values',title:'values',width:200,formatter:function(value,row,index){
+						        													if(value != undefined){
+						        														return '<span title="'+value+'">'+value+'</span>';
+						        													}
+																	        	}
+						        },
+						        {field:'action',title:'操作',width:50,formatter:function(value,row,index){
+						        	var newStr = escape(row.values); 
+						        	var param = "\'"+newStr+"\'";
+					        		return '<a style="cursor:pointer" onclick="parseNote('+param+');">查看</a>';
+						        	}
+						        }    
+						    ]]
+				   
+				});
+				hcodg=$('#hcodg').datagrid({ 
+					fitColumns:true,
+					idField:'consultid', 
+					rownumbers : true,
+				    url:'/healthRecord/findProfile',  				   
+				    pagination : true,  
+				    sortName : 'consultid',
+					sortOrder : 'desc',
+					singleSelect:"true",
+					checkOnSelect:false,
+					selectOnCheck:false,
+					pageSize : 10,
+					pageList : [ 10, 20, 30, 40, 50, 100, 200, 300, 400, 500 ], 
+				    columns:[[    
+				        {field:'personid',title:'personid',width:170},    
+				        {field:'consultid',title:'consultid',width:70},
+				        {field:'userid',title:'userid',width:70},
+				        {field:'problem',title:'problem',width:100,formatter:function(value,row,index){
+				        													if(value != undefined){
+				        														return '<span title="'+value+'">'+value+'</span>';
+				        													}
+															        	}
+				        },
+				        {field:'doctorid',title:'doctorid',width:70},
+				        {field:'department',title:'department',width:100},
+				        {field:'doctortype',title:'doctortype',width:70},
+				        {field:'doctor',title:'doctor',width:70},
+				        {field:'startdatetime',title:'startdatetime',width:100},
+				        {field:'enddatetime',title:'enddatetime',width:100},
+				        {field:'doctype',title:'doctype',width:100,hidden:true},
+		        		{field:'symptom',title:'symptom',width:100,hidden:true},
+		        		{field:'medication',title:'medication',width:100,hidden:true},
+		        		{field:'healthplan',title:'healthplan',width:100,hidden:true}
+				    ]],
+				view: detailview,
+                detailFormatter:function(index,row){
+                    return '<div class="ddv" style="padding:5px 0"></div>';
+                },
+                onExpandRow: function(index,row){
+                    var ddv = $(this).datagrid('getRowDetail',index).find('div.ddv');                   
+                    ddv.panel({
+                        height:180,
+                        border:false,
+                        cache:false,
+                        href:'/healthRecord/showDesc?userid='+row.userid+'&consultid='+row.consultid+'&orgcode=PAJK_CD&doctype=health_consult_online&senderSystem=PAJK_CD&senderApplication=CD_APP',
+                        onLoad:function(){
+                        	hcodg.datagrid('fixDetailRowHeight',index);
+                        }
+                    });
+                    hcodg.datagrid('fixDetailRowHeight',index);
+                }
+				});	
+				hrpdg=$('#hrpdg').datagrid({ 
+					fitColumns:true,
+					idField:'userid', 
+					rownumbers : true,
+				    url:'/healthRecord/findProfile',  				   
+				    pagination : true,  
+				    sortName : 'userid',
+					sortOrder : 'desc',
+					checkOnSelect:false,
+					selectOnCheck:false,
+					pageSize : 10,
+					pageList : [ 10, 20, 30, 40, 50, 100, 200, 300, 400, 500 ], 
+					columns:[[    
+						        {field:'personId',title:'personId',width:100},    
+						        {field:'orgCode',title:'orgCode',width:30},
+						        {field:'created',title:'created',width:50},
+						        {field:'userId',title:'userId',width:50},
+						        {field:'values',title:'values',width:200,formatter:function(value,row,index){
+						        													if(value != undefined){
+						        														return '<span title="'+value+'">'+value+'</span>';
+						        													}
+																	        	}
+						        },
+						        {field:'action',title:'操作',width:50,formatter:function(value,row,index){
+						        	var newStr = escape(row.values); 
+						        	var param = "\'"+newStr+"\'";
+					        		return '<a style="cursor:pointer" onclick="parseNote('+param+');">查看</a>';
+						        	}
+						        }    
+						    ]]
+				   
+				});
+				
+				hdrpdg=$('#hdrpdg').datagrid({ 
+					fitColumns:true,
+					idField:'userid', 
+					rownumbers : true,
+				    url:'/healthRecord/findProfile',  				   
+				    pagination : true,  
+				    sortName : 'userid',
+					sortOrder : 'desc',
+					checkOnSelect:false,
+					selectOnCheck:false,
+					pageSize : 10,
+					pageList : [ 10, 20, 30, 40, 50, 100, 200, 300, 400, 500 ], 
+					columns:[[    
+						        {field:'personId',title:'personId',width:100},    
+						        {field:'orgCode',title:'orgCode',width:30},
+						        {field:'created',title:'created',width:50},
+						        {field:'userId',title:'userId',width:50},
+						        {field:'values',title:'values',width:200,formatter:function(value,row,index){
+						        													if(value != undefined){
+						        														return '<span title="'+value+'">'+value+'</span>';
+						        													}
+																	        	}
+						        },
+						        {field:'action',title:'操作',width:50,formatter:function(value,row,index){
+						        	
+						        	var newStr = escape(row.values); 
+						        	var param = "\'"+newStr+"\'";
+					        		return '<a style="cursor:pointer" onclick="parseNote('+param+');">查看</a>';
+						        	}
+						        }    
+						    ]]
+				   
+				});
+				
+			});
+			
+			//清空查询表单
+			function clearFun(){
+				$('#searchForm input').val('');
+				
+			}
+			//查询方法
+			function searchFun(){
+				
+				if($("#full").get(0).checked){
+					
+					var tabs = $('#dataTab').tabs('tabs');
+					
+					for (var i=0;i<tabs.length;i++){
+						 var tab = $('#dataTab').tabs('getTab',i);
+						 var tabid =tab.attr('id')
+					     
+						 queryData(tabid);
+						 tab.panel('refresh');   
+					}
+					
+				}else{
+					
+					//获取选中的选项卡对象
+		            var selectTab = $('#dataTab').tabs('getSelected'); 
+		            var tabid =selectTab.attr('id')
+		            queryData(tabid);
+		            selectTab.panel('refresh');   
+				}
+				
+			}
+			function queryData(tabid){
+				if('healthPerson'==tabid){
+					$('#orgcode').val('PAJK_CD');
+					$('#doctype').val('health_person');
+					
+					hpdg.propertygrid('load',base.serializeObject($('#searchForm')));
+				}else if('getSlaveUsers' == tabid){
+					$('#orgcode').val('PAJK_CD');
+					$('#doctype').val('getSlaveUsers');
+					
+					gsudg.propertygrid('load',base.serializeObject($('#searchForm')));
+				}else if('healthPhyExamProfile'==tabid){
+					$('#orgcode').val('PAJK_PR');
+					$('#doctype').val('health_phy_exam_profile');
+					hpepdg.datagrid('load',base.serializeObject($('#searchForm')));
+				}else if('healthVisitingProfile'==tabid){
+					$('#orgcode').val('PAJK_MQ');
+					$('#doctype').val('health_visiting_profile');
+					hvpdg.datagrid('load',base.serializeObject($('#searchForm')));
+				}else if('healthUserProfile'==tabid){
+					$('#orgcode').val('PAJK_MQ');
+					$('#doctype').val('health_user_profile');
+					hupdg.datagrid('load',base.serializeObject($('#searchForm')));
+				}else if('healthGeneProfile'==tabid){
+					$('#orgcode').val('PAJK_MQ');
+					$('#doctype').val('health_gene_profile');
+					hgpdg.datagrid('load',base.serializeObject($('#searchForm')));
+				}else if('healthConsultOnline'==tabid){
+					$('#orgcode').val('PAJK_CD');
+					$('#doctype').val('health_consult_online');
+					hcodg.datagrid('load',base.serializeObject($('#searchForm')));
+				}else if('healthRegisterProfile'==tabid){
+					$('#orgcode').val('PAJK_CD');
+					$('#doctype').val('health_register_profile');
+					hrpdg.datagrid('load',base.serializeObject($('#searchForm')));
+				}else if('healthDiagnosesRecipeProfile'==tabid){
+					$('#orgcode').val('PAJK_CD');
+					$('#doctype').val('health_diagnoses_recipe_profile');
+					hdrpdg.datagrid('load',base.serializeObject($('#searchForm')));
+				}
+				 
+			}
+			/**
+			 * 解析
+			 * @returns {} 
+			 */
+			var descDialog;
+			function parseNote(note){
+				var newStr = unescape(note);
+				//console.info(newStr);
+				descDialog =$("<div/>").dialog({
+					title: '详情',    
+				    width: 1000,    
+				    height:600,    
+				    closed: false,    
+				    cache: false,    
+				    href: '/views/healthRecord/profileDetail.html',    
+				    modal: true,
+				    onLoad:function(){
+						$.post('/healthRecord/parseNote',{note:newStr},function(data){
+							
+							$('#output').html(data);
+						});
+					},
+					onClose:function(){
+						//在窗口关闭之后触发
+						descDialog.dialog('destroy');
+					}  
+				});
+			}
+			/**
+			 * 新增函数
+			 * @returns {} 
+			 */
+			var addUserDialog;
+			function insertFun(){
+				addUserDialog =$("<div/>").dialog({
+									title: '新增用户',    
+								    width: 600,    
+								    height:500,    
+								    closed: false,    
+								    cache: false,    
+								    href: '/views/healthRecord/addUser.html',    
+								    modal: true,
+								    buttons : [ {
+										text : '添加',
+										handler : function() {
+											$('#addUserForm').form('submit', {   
+												url: '/healthRecord/createUser',  
+											    success: function(data){ 
+											    	
+											    	var json=$.parseJSON(data);  
+											    	
+											        if (json.flag==1){
+											        	//刷新数据列表,效率较低
+											        	hpdg.propertygrid('reload');
+											        	//消息提示 
+											            showMessage('提示',json.msg);
+											        }else{
+											        	showMessage('错误',json.msg);
+											        } 
+											        //关闭弹出窗
+										        	addUserDialog.dialog('close');
+										        	
+											    }    
+											}); 
+										}
+									}],
+									onClose:function(){
+										//在窗口关闭之后触发
+										addUserDialog.dialog('destroy');
+									}  
+							});
+			}
+			
+			/**
+			 * 更新函数
+			 * @returns {} 
+			 */
+			var editUserDialog;
+			function editFun(){
+				
+				var vali = $("#searchForm").form('validate');
+				if(!vali){
+					$.messager.alert('Warning','用户id不能为空!');
+					return;
+				}
+				var userId = $("#userid").val();
+				editUserDialog =$("<div/>").dialog({
+							title: '更新用户',    
+						    width: 600,    
+						    height:500,    
+						    closed: false,    
+						    cache: false,    
+						    href: '/views/healthRecord/updateUser.html',    
+						    modal: true,
+						    buttons : [ {
+								text : '更新',
+								handler : function() {
+									$('#editUserForm').form('submit', {   
+											url: '/healthRecord/updateUser',  
+										    success: function(data){ 
+										    	
+										    	var json=$.parseJSON(data); 
+										    	
+										        if (json.flag==1){
+										        	//刷新数据列表,效率较低
+										        	hpdg.propertygrid('reload');
+										        	//消息提示 
+										            showMessage('提示',json.msg);
+										        }else{
+										        	showMessage('提示',json.msg);
+										        }  
+										        //关闭弹出窗
+									        	editUserDialog.dialog('close');
+										    }    
+										}); 
+								}
+							} ],
+							onLoad:function(){
+								//加载编辑窗口的时候，给表单赋值
+								$.get('/healthRecord/getUser',{userId:userId},function(data){
+									//console.info(data);
+									//console.info(data.result);
+									if(data.success){
+										$('#editUserForm').form('load',data.result);
+									}
+								});
+							},
+							onClose:function(){
+								//在窗口关闭之后触发
+								editUserDialog.dialog('destroy');
+							}
+							  
+				});
+				
+			}
+			/**
+			*  更新关联关系
+			*/
+			function updateRelation(slaveUserId,flag){
+				var userId = $("#userid").val();
+				if(userId==''){
+					$.messager.alert('提示', 'userId不能为空!', 'error');
+					return;
+				}
+				var tip;
+				if(flag==1){
+					tip="确定要添加此关联关系吗?"
+				}else{
+					tip="确定要解除此关联关系吗?"
+				}
+				$.messager.confirm('请确认',tip, function(r) {
+					if(r){
+						$.ajax({
+							url : '/healthRecord/updateRelation',  
+							data : {
+								masterUserId:userId,
+								slaveUserId:slaveUserId,
+								flag:flag
+							},
+							dataType : 'json',
+							success : function(data) {
+								 if(data.status==0){
+									gsudg.datagrid('reload');
+									gsudg.datagrid('unselectAll');
+								  	showMessage( '提示','操作成功');
+								 }else{
+								 	showMessage( '提示',data.desc);
+								 }
+							}
+						});
+					}
+					
+				});
+			}
+			/**
+			 * 提示消息
+			 * @param {} title
+			 * @param {} msg
+			 * @returns {} 
+			 */
+			function showMessage(title,msg){
+				$.messager.show({
+					title:title,
+					msg:msg,
+					showType:'slide',
+					timeout:5000
+				});
+			}
+		</script>
+</body> 
+
+</html>

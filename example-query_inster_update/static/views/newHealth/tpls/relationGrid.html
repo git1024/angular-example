@@ -1,0 +1,62 @@
+<div ng-controller="relationCtrl">
+<div class="row">
+    <div class="panel panel-primary">
+		<div class="panel-heading">查询条件</div>
+		<div class="panel-body">
+			
+		     <div class="input-group">
+		     	<label class="input-group-addon">搜索</label>
+	  			<input type="text" class="form-control" id="searchText2" ng-model="searchText2" placeholder="请输入userId"/>
+		     </div>
+			
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="panel panel-primary">
+		<div class="panel-heading">查询结果</div>
+		<div class="panel-body">
+			
+			<table class="table table-bordered table-hover">
+			  <thead>
+			  <tr>
+			    <th ng-repeat="column in columns">
+			      {{column}}
+			    </th>
+			  </tr>
+			  </thead>
+			  <tbody>
+				  <tr ng-repeat="item in items">
+				  	<td>{{($index+1)|sequenceNum:paginationConf.currentPage:paginationConf.itemsPerPage}}</td>
+				   	<td>{{item.userId}}</td>
+				    <td>{{item.userName}}</td>
+				    <td>{{item.orgCode}} </td>
+				    <td>{{item.sexCode}}</td>
+				    <td>{{item.bloodType}}</td>
+				    <td>{{item.dob}}</td>
+				    <td>{{item.address1}}</td>
+				    <td>
+				    	
+				    	<button type="button" 
+				    	class="btn btn-info"
+				    	ng-show="item.refCode=='link'"
+				    	ng-click="openConfirm(item.userId,item.refCode)"
+				    	>{{item.refCode}}</button>
+				    	<button type="button" 
+				    	class="btn btn-warning"
+				    	ng-show="item.refCode=='unLink'"
+				    	ng-click="openConfirm(item.userId,item.refCode)"
+				    	>{{item.refCode}}</button>
+				    </td>
+				  </tr>
+			  </tbody>
+			</table>
+			 <tm-pagination conf="paginationConf"></tm-pagination>
+		</div>
+		
+	</div>
+</div> 
+</div>
+	
+
+

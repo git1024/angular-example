@@ -1,0 +1,101 @@
+<div ng-controller="profileCtrl">
+
+<div class="row">
+    <div class="panel panel-primary">
+		<div class="panel-heading">查询条件</div>
+		<div class="panel-body">
+			
+		     <div class="input-group">
+		     	<label class="input-group-addon">搜索</label>
+	  			<input type="text" class="form-control" ng-model="searchProfile" placeholder="请输入userId"/>
+		     </div>
+			
+		</div>
+	</div>
+</div> 
+<div class="row">
+	
+		<div class="panel panel-primary">
+			<div class="panel-heading">查询结果</div>
+			<div ng-if="queryError">
+				<div class="panel-body">
+					<div class="alert alert-danger" role="alert">{{queryMsg}}</div>
+				</div>
+			</div>
+			<div ng-if="multiData">
+				<div class="panel-body">
+						<table class="table table-bordered table-hover">
+						  <thead>
+						  <tr>
+						    <th ng-repeat="column in columns">
+						      {{column}}
+						    </th>
+						  </tr>
+						  </thead>
+						  <tbody>
+							  <tr ng-repeat="item in items">
+							  	<td class="col-md-1">{{($index+1)|sequenceNum:paginationConf.currentPage:paginationConf.itemsPerPage}}</td>
+							   	<td class="col-md-3">{{item.personId}}</td>
+							    <td class="col-md-2">{{item.userId}}</td>
+							    <td class="col-md-2">{{item.orgCode}}</td>
+							    <td class="col-md-3">{{item.created}}</td>
+							    <td class="col-md-1">
+							       <button type="button" class="btn btn-primary" ng-click="showInfo(item.items)">查看</button>
+							    </td>
+							    
+							  </tr>
+						  </tbody>
+						</table>
+						 <tm-pagination conf="paginationConf"></tm-pagination>
+					</div>
+			</div>
+			<div ng-if="singleData">
+				<div class="panel-body">
+					<table class="table table-bordered">
+						<tr>
+							<td class="bg-info">personId</td>
+							<td>{{profile.personId}}</td>
+						 	<td class="bg-info">orgCode</td>
+							<td>{{profile.orgCode}}</td>
+						</tr> 
+						<tr>
+							<td class="bg-info">档案类型</td>
+							<td>{{profile.doctype}}</td>
+						 	<td class="bg-info">创建时间</td>
+							<td>{{profile.created}}</td>
+						</tr>
+					</table>
+					<table class="table table-bordered">
+					    <tr ng-repeat="item in profile.items">
+							<td class="col-md-3 bg-info">{{item.name}}</td>
+							<td class="col-md-9">{{item.value}}</td>
+						</tr>
+						
+					</table>
+				</div>
+			</div>
+			<!-- <div class="panel-body">
+					<table class="table table-bordered">
+						<tr>
+							<td class="bg-info">档案类型</td>
+							<td>{{profile.doctype}}</td>
+						 	<td class="bg-info">创建时间</td>
+							<td>{{profile.created}}</td>
+						</tr> 
+					</table>
+					<table class="table table-bordered">
+				
+				    <tr ng-repeat="item in profile.items">
+						<td class="col-md-3 bg-info">{{item.name}}</td>
+						<td class="col-md-9">{{item.value}}</td>
+					</tr>
+				</table>
+			</div>
+			<ul>
+			 <li ng-repeat='(key, value) in mapObj'>
+		        <span>Key: {{key}}, value: {{value}}</span>
+		    </li>
+		    </ul> -->
+	</div>	
+</div>
+</div>

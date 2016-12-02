@@ -1,0 +1,25 @@
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <div class="panel-title">
+        	<span>{{ngDialogData.title}}</span>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                   	<table class="table table-condensed" style="word-break:break-all; word-wrap:break-all;">
+					    <tr ng-repeat="entry in entrys">
+							<td class="col-md-3 bg-info">{{entry.name}}</td>
+							<td class="col-md-9">
+								<p>{{entry.value}}</p>
+							</td>
+						</tr>
+					</table>
+            </div>
+        </div>
+        <div class="ngdialog-buttons">
+            <button type="button" class="ngdialog-button ngdialog-button-secondary" ng-click="closeThisDialog('Cancel')">取消</button>
+              
+        </div>
+    </div>         
+</div>

@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="/jquery-easyui-1.4.5/themes/bootstrap/easyui.css" >
+<link rel="stylesheet" type="text/css" href="/jquery-easyui-1.4.5/themes/icon.css" >
+<script type="text/javascript" src="/jquery-easyui-1.4.5/jquery.min.js"></script>
+<script type="text/javascript" src="/jquery-easyui-1.4.5/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="/jquery-easyui-1.4.5/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="/jquery-easyui-1.4.5/datagrid-detailview.js"></script>
+<script type="text/javascript" src="/commons/commons.js"></script>
+<script type="text/javascript" src="/commons/easyui-extension.js"></script>
+
+<title>数据迁移</title>
+</head>
+
+<body class="easyui-layout" >   
+	  
+		<div data-options="region:'north',title:'',split:false" style="height:300px;padding:10px;">
+			<form id="searchForm">
+				<table style="font-size:10px;">
+					<tr>
+						<td>选择需要迁移的表</td>
+						<td>
+							 <select id="seltable" class="easyui-combobox" name="state1" multiple="true" multiline="true" label="" labelPosition="top" style="width:300px;height:100px;">
+				                <option value="health_phy_exam_profile">health_phy_exam_profile</option>
+				                <option value="health_user_profile">health_user_profile</option>
+				                <option value="health_gene_profile">health_gene_profile</option>
+				                <option value="health_consult_online">health_consult_online</option>
+				                <option value="health_visiting_profile">health_visiting_profile</option>
+				                <option value="health_register_profile">health_register_profile</option>
+				                <option value="health_diagnoses_recipe_profile">health_diagnoses_recipe_profile</option>
+				                <option value="health_walk_profile">health_walk_profile</option>
+				                <option value="health_phy_exam_detail">health_phy_exam_detail</option>
+				                
+				            </select>
+						</td>
+					</tr>
+					<tr>
+						<td>指定从rowkey位置进行迁移</td>	
+						<td>
+							<input class="easyui-textbox" id="rk" name="rowkey" style="width:300px;height:60px" data-options="multiline:true">&nbsp;&nbsp;<font color="red">多张表做迁移时,rowkey用逗号分隔</font>
+						</td>
+					</tr>
+					<tr>	
+						<td>指定每次查询数据的数量</td>
+						<td>
+							<select id="pagesize" class="easyui-combobox" name="state2" label="" labelPosition="top" style="width:300px;">
+			                	<option value="1" selected>1</option>
+			                	<option value="2">2</option>
+			                	<option value="10">10</option>
+			                	<option value="20">20</option>
+			                	<option value="50">50</option>
+			                	<option value="100">100</option>
+			                	<option value="1000">1000</option>
+			                	<option value="2000">2000</option>
+			                </select>
+						</td>
+					</tr>
+					<tr>	
+						<td>指定查询最大次数</td>
+						<td>
+							<select id="page" class="easyui-combobox" name="state3" label="" labelPosition="top" style="width:300px;">
+			                	<option value="-1">不限制</option>
+			                	<option value="1" selected>1</option>
+			                	<option value="2">2</option>
+			                	<option value="3">3</option>
+			                	<option value="4">4</option>
+			                	<option value="5">5</option>
+			                	<option value="6">6</option>
+			                	<option value="7">7</option>
+			                	<option value="8">8</option>
+			                	<option value="9">9</option>
+			                	<option value="10">10</option>
+			                </select>
+						</td>
+					</tr>
+					<tr>	
+						<td></td>
+						<td align="left">
+							<a id="btn" href="#" onclick="searchFun();" class="easyui-linkbutton" data-options="">迁移</a>			
+						</td>
+					</tr>
+				</table>
+			</form>
+			<div id="p" style="width:400px;"></div>
+		</div>   
+      
+	    <div data-options="region:'center',title:''" style="padding:1px;background:#eee;">
+	    	<div id="output" style="padding:10px 10px 10px 10px;"></div>
+	    	
+	    </div> 
+		
+</body> 
+<script type="text/javascript">
+			//查询方法
+			function searchFun(){
+				
+				var rowkey = $("#rk").val();
+				var rkarr = rowkey.split(",");
+				
+				var tnames = $("#seltable").combobox("getValues");
+				var len = tnames.length;
+				if(len==0){
+					$.messager.alert('警告','请选择需要迁移的表!','warning');
+					return;
+				}
+				if(len != rkarr.length){
+					$.messager.alert('警告','迁移的表和指定的rowkey数目不匹配!','warning');
+					return;
+				}
+				var pagesize = $("#pagesize").combobox("getValue");
+				var page = $("#page").combobox("getValue");
+				var tip="确定要对选择的表进行数据迁移吗?";
+				$.messager.confirm('请确认',tip, function(r) {
+					if(r){
+						 $('#btn').linkbutton({
+								disabled:true
+						 }); 
+							 
+						createProgressbar();
+						
+						for(var i = 0;i< len; i++) {
+							var pre = ((i+1)/len)*100;
+							dataHandler(tnames[i],rkarr[i],pagesize,page,pre);
+						} 
+					}
+					
+				});
+			}
+			function dataHandler(tableName,rowkey,pagesize,page,pre){
+				$.ajax({
+					url : '/healthRecord/dataMove',  
+					data : {
+						tableName:tableName,
+						rowkey:rowkey,
+						pagesize:pagesize,
+						page:page
+					},
+					dataType : 'json',
+					success : function(data) {
+						 if(data.status==0){
+							 $('#p').progressbar('setValue',pre);
+							 var erk = data.errorRowKeys;
+							
+							 $("#output").append("<p>"+tableName+",数据迁移完成数量 "+data.totals+"条</p>");
+							 if(erk != ""){
+								 $("#output").append("<p>处理失败数据的rowkey有:"+erk+"</p>");	 
+							 }
+							 
+						 }else{
+						 	showMessage( '提示',data.desc);
+						 }
+					}
+				});
+			}
+			function createProgressbar(){
+				$('#p').progressbar({
+				    value: 10
+				});
+			}
+			
+			/**
+			 * 提示消息
+			 * @param {} title
+			 * @param {} msg
+			 * @returns {} 
+			 */
+			function showMessage(title,msg){
+				$.messager.show({
+					title:title,
+					msg:msg,
+					showType:'slide',
+					timeout:5000
+				});
+			}
+			
+		</script>
+</html>

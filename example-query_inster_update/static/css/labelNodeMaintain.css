@@ -1,0 +1,54 @@
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td {margin:0;padding:0;}
+#labelNodeMaintain{
+    width: 99%;
+    height: 125px;
+    border: 1px solid #ddd;
+    margin-top: 5px;
+
+}
+#labelNodeDisplay{
+    width: 99%;
+    height: 530px;
+    border: 1px solid #ddd;
+}
+.center
+{
+    margin-left:auto;
+    margin-right:auto;
+    width:99%;
+}
+
+.label-head{
+    height: 40px;
+    background-color: #000;
+    padding-top: 6px;
+    padding-left: 6px;
+    margin-bottom: 3px;
+}
+.label-head h3{
+    padding-top: 3px;
+    color: #fff;
+
+}
+.label-div-from{
+    height: auto;
+    margin-top: 30px;
+    margin-left: 10px;
+}
+.label-div-from label{
+    width: 72px;
+}
+
+#btn-find{
+    padding-right: 0px;
+}
+.label-th{
+
+    text-align: center;
+
+}
+.label-select{
+    height:23px ;
+    width:180px ;
+}
+
