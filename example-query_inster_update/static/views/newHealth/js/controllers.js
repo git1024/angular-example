@@ -9,6 +9,9 @@ personModule.controller('personCtrl', function($scope,ngDialog,ngTip,$timeout,$h
 	var timeout; 
 	
 	 var selectPerson = function(url){
+		 if($scope.searchText==undefined ){
+			 return;
+		 }
 		 if($scope.searchText==''|| $scope.searchText==null ){
 			ngTip.tip('请输入查询的用户ID','warning'); 
 			return;
@@ -62,13 +65,6 @@ personModule.controller('personCtrl', function($scope,ngDialog,ngTip,$timeout,$h
     		 ngTip.tip('获取用户数据错误','danger'); 
     		 return;
     	 }
-    	// console.info(vm.user);
-    	
-    	 var strTime=vm.user.birthday;      //字符串日期格式          
-    	 if(strTime !=undefined){
-    		
-    		 vm.user.birthday = new Date(Date.parse(strTime.replace(/-/g,"/"))); //转换成Date(); 
-    	 }
     	 
     	 ngDialog.open({
         	 showClose: false,
@@ -83,16 +79,11 @@ personModule.controller('personCtrl', function($scope,ngDialog,ngTip,$timeout,$h
      }
    
      $scope.submitForm = function(isValid) {
-    	 console.info('isUpdate:'+$scope.isUpdate);
-    	 
+    	
     	  if (!isValid) {
     		  ngTip.tip('表单验证失败','danger');
     	  }else{
-    		
-	    	 var ddate = vm.user.birthday;
-	    	 var ddateStr = ddate.getFullYear()+"-"+(ddate.getMonth()+1)+"-"+ddate.getDate();	    	 
-	    	 $scope.vm.user.birthday = ddateStr;
-	    	// console.info($scope.vm.user);
+	    	
 	    	 var url;
 	    	 if($scope.isUpdate){
 	    		 url = "/nhc/updateUser"
@@ -115,63 +106,7 @@ personModule.controller('personCtrl', function($scope,ngDialog,ngTip,$timeout,$h
 	         });
     	  }
      };
-     
-     ////////////////
-     ////////////////
-     //$scope.dat = null;
-     $scope.format = "yyyy-MM-dd";
-     $scope.altInputFormats = ['yyyy/MM/dd'];
-      
-     $scope.popup1 = {
-        opened: false
-     };
-	 $scope.open1 = function () {
-		 $scope.popup1.opened = true;
-	 };
-	 $scope.dateOptions = {
-		 customClass: getDayClass,//自定义类名
-		// dateDisabled: isDisabled//是否禁用
-	 }
- 
- 
-	 var tomorrow = new Date();
-	 tomorrow.setDate(tomorrow.getDate() + 1);
-	 var afterTomorrow = new Date();
-	 afterTomorrow.setDate(tomorrow.getDate() + 1);
-	 $scope.events = [
-	   {
-		   date: tomorrow,
-		   status: 'full'
-	   },
-	   {
-		   date: afterTomorrow,
-		   status: 'partially'
-	   }
-	 ];
-	 //为日期面板中的每个日期（默认42个）返回类名。传入参数为{date: obj1, mode: obj2}
-	 function getDayClass(obj) {
-		 var date = obj.date,
-		   mode = obj.mode;
-		 if (mode === 'day') {
-			 var dayToCheck = new Date(date).setHours(0, 0, 0, 0);
 
-			 for (var i = 0; i < $scope.events.length; i++) {
-				 var currentDay = new Date($scope.events[i].date).setHours(0, 0, 0, 0);
-
-				 if (dayToCheck === currentDay) {
-					 return $scope.events[i].status;
-				 }
-			 }
-		 }
-		 return '';
-	 }
-	 //设置日期面板中的所有周六和周日不可选
-	/* function isDisabled(obj) {
-		 var date = obj.date,
-		   mode = obj.mode;
-		 return mode === 'day' && (date.getDay() === 0 || date.getDay() === 6);
-	 }*/
-	
 });
  
 var relModule = angular.module("relationModule", []);
@@ -184,12 +119,12 @@ relModule.controller('relationCtrl', function($scope,$timeout,ngDialog,ngTip,$ht
             '血型','生日','地址','关系'
 	  ];
 	 $scope.openConfirm = function (userId,refCode) {
-		 if($scope.searchText2==''|| $scope.searchText2==null ){
+		 if($scope.searchText2==''|| $scope.searchText2==undefined ){
 			ngTip.tip('查询的主用户id不能为空.','danger');
 			return;
 		 } 
 		 var keyword = $scope.searchText2;
-		 console.info(userId+","+refCode);
+		// console.info(userId+","+refCode);
          ngDialog.openConfirm({
             // template: 'modalDialogId',
              template:
@@ -219,7 +154,11 @@ relModule.controller('relationCtrl', function($scope,$timeout,ngDialog,ngTip,$ht
         
      };
 	var getSlaveUsers = function () {
-		if($scope.searchText2==''|| $scope.searchText2==undefined ){
+		if($scope.searchText2==undefined ){
+			 return;
+		 }
+		if($scope.searchText2==''|| $scope.searchText2==null ){
+			ngTip.tip('查询的主用户id不能为空.','danger');
 			return;
 		} 
         var postData = {
@@ -263,7 +202,7 @@ relModule.controller('relationCtrl', function($scope,$timeout,ngDialog,ngTip,$ht
 
 var profileModule = angular.module("profileModule", []);
 profileModule.controller('profileCtrl', function($scope,ngDialog,ngTip,$timeout,$http,$state,$stateParams) {
-	console.info($stateParams.tn);
+	console.info($stateParams.tn+","+$scope.searchProfile);
 	var timeout; 
     //修改菜单颜色
     var menuid = "#tn"+$stateParams.tn;
@@ -282,8 +221,12 @@ profileModule.controller('profileCtrl', function($scope,ngDialog,ngTip,$timeout,
 	    }, true);
 	 
 	 var selectProfile = function(){
-		 if($scope.searchProfile=='' || $scope.searchProfile==undefined){
-			 console.info('not query');
+		 if($scope.searchProfile==undefined ){
+			 console.info('no query');
+			 return;
+		 }
+		 if($scope.searchProfile=='' || $scope.searchProfile==null){
+			 ngTip.tip('查询的主用户id不能为空.','danger');
 			 return;
 		 }
 	        var param = {
