@@ -1,0 +1,159 @@
+<div ng-controller="consultmrCtrl">
+
+<div class="row">
+    <div class="panel panel-primary">
+		<div class="panel-heading">查询条件</div>
+		<div class="panel-body">
+			<form class="form-horizontal" name="consultForm" ng-submit="submitConsultForm(consultForm.$valid)" novalidate >
+			  <div class="row">
+			  	 <div class="col-sm-6">
+			  			<div class="form-group has-feedback" ng-class="{'has-error': consultForm.userId.$invalid && !consultForm.userId.$pristine }">
+						   <div class="col-sm-3 control-label">
+						   <label for="name">用户ID</label>
+						   </div>
+						   <div class="col-sm-9">
+						   <input ng-model="cst.userId" required class="form-control input-sm" id="userId" name="userId" type="text"  placeholder="必填项"/>
+						  		<span ng-show="consultForm.userId.$dirty && consultForm.userId.$valid" class="glyphicon glyphicon-ok form-control-feedback"></span>
+						  		<span ng-show="consultForm.userId.$invalid && !consultForm.userId.$pristine" class="glyphicon glyphicon-remove form-control-feedback"></span>
+						   </div>
+						 </div>
+				  </div>
+				  <div class="col-sm-6">
+				  		<div class="form-group has-feedback" ng-class="{'has-error': consultForm.hospitalId.$invalid && !consultForm.hospitalId.$pristine }">
+						   <div class="col-sm-3 control-label">
+						   <label for="name">医院ID</label>
+						   </div>
+						   <div class="col-sm-9">
+						   <input ng-model="cst.hospitalId" required class="form-control input-sm" id="hospitalId" name="hospitalId" type="text"  placeholder="必填项"/>
+						  		<span ng-show="consultForm.hospitalId.$dirty && consultForm.hospitalId.$valid" class="glyphicon glyphicon-ok form-control-feedback"></span>
+						  		<span ng-show="consultForm.hospitalId.$invalid && !consultForm.hospitalId.$pristine" class="glyphicon glyphicon-remove form-control-feedback"></span>
+						   </div>
+						</div>
+				  </div>
+			  </div>
+			  <div class="row">
+			  		<div class="col-sm-6">
+			  			 <div class="form-group">
+						    <label class="col-sm-3 control-label">就诊ID</label>
+						    <div class="col-sm-9">
+						      <input ng-model="cst.visitId" type="text" class="form-control input-sm" id="visitId" name="visitId">
+						    </div>
+						  </div>
+			  		</div>
+			  		<div class="col-sm-6">
+			  			<div class="form-group has-feedback" ng-class="{'has-error': consultForm.consultType.$invalid && !consultForm.consultType.$pristine }">
+						   <div class="col-sm-3 control-label">
+						   <label for="name">问诊类型</label>
+						   </div>
+						   <div class="col-sm-9">
+						   		 <select ng-model="cst.consultType" required id="consultType" name="consultType" class="form-control input-sm"  placeholder="必填项">
+						      	  
+								  <option value="1">线上问诊,咨询</option>
+								  <option value="2">线下医院就诊,门诊病历</option>
+								  <option value="3">检查报告</option>
+								  <option value="4">检验报告</option>
+								  <option value="5">处方</option>
+								  <option value="3,4">检验检查报告</option>
+								</select>
+						  		<span ng-show="consultForm.consultType.$dirty && consultForm.consultType.$valid" class="glyphicon glyphicon-ok form-control-feedback"></span>
+						  		<span ng-show="consultForm.consultType.$invalid && !consultForm.consultType.$pristine" class="glyphicon glyphicon-remove form-control-feedback"></span>
+						   </div>
+						  </div>
+			  		</div>
+			  </div>
+			  <div class="row">
+			  	<div class="col-sm-6">
+			  		 <div class="form-group">
+					    <label class="col-sm-3 control-label">开始时间</label>
+					    <div class="col-sm-9">
+					      <div class="input-group">
+				                <input type="text" class="form-control input-sm" uib-datepicker-popup="{{format}}" ng-model="dat1" is-open="popup1.opened" ng-required="false" close-text="关闭"
+				                       clear-text="清空" current-text="今天" alt-input-formats="altInputFormats" />
+				                <span class="input-group-btn">
+				                    <button type="button" class="btn btn-default btn-sm" ng-click="open1()"><i class="glyphicon glyphicon-calendar"></i></button>
+				                </span>
+				            </div>
+					    </div>
+					</div>
+			  	</div>
+			  	<div class="col-sm-6">
+			  		 <div class="form-group">
+					    <label class="col-sm-3 control-label">结束时间</label>
+					    <div class="col-sm-9">
+					      	<div class="input-group">
+				                <input type="text" class="form-control input-sm" uib-datepicker-popup="{{format}}" ng-model="dat2" is-open="popup2.opened" ng-required="false" close-text="关闭"
+				                       clear-text="清空" current-text="今天" alt-input-formats="altInputFormats" />
+				                <span class="input-group-btn">
+				                    <button type="button" class="btn btn-default btn-sm" ng-click="open2()"><i class="glyphicon glyphicon-calendar"></i></button>
+				                </span>
+				            </div>
+					    </div>
+					 </div>
+			  	</div>
+			  </div>
+			  <div class="form-group">
+			    <div class="col-sm-offset-2 col-sm-10">
+			      <button type="submit" class="btn btn-default">查询</button>
+			    </div>
+			  </div>
+			</form>
+		</div>
+	</div>
+</div> 
+<div class="row">
+		<div class="panel panel-primary">
+			<div class="panel-heading">查询结果</div>
+			<div ng-if="multiData">
+				<div class="panel-body">
+						<table class="table table-bordered table-hover">
+						  <thead>
+						  <tr>
+						    <th ng-repeat="column in columns">
+						      {{column}}
+						    </th>
+						  </tr>
+						  </thead>
+						  <tbody>
+							  <tr ng-repeat="item in items">
+							  	<td class="col-md-1">{{($index+1)|sequenceNum:paginationConf.currentPage:paginationConf.itemsPerPage}}</td>
+							   	<td class="col-md-3">{{item.hospitalId}}</td>
+							    <td class="col-md-2">{{item.visitId}}</td>
+							    <td class="col-md-2">{{item.userId}}</td>
+							    <td class="col-md-3">{{item.created}}</td>
+							    <td class="col-md-1">
+							       <button type="button" class="btn btn-primary" ng-click="showConsultMRInfo(item.items)">查看</button>
+							    </td>
+							  </tr>
+						  </tbody>
+						</table>
+						 <tm-pagination conf="paginationConf"></tm-pagination>
+					</div>
+			</div>
+			<div ng-if="singleData">
+				<div class="panel-body">
+					<table class="table table-bordered">
+						<tr>
+							<td class="bg-info">personId</td>
+							<td>{{profile.personId}}</td>
+						 	<td class="bg-info">医院ID</td>
+							<td>{{profile.hospitalId}}</td>
+						</tr> 
+						<tr>
+							<td class="bg-info">档案类型</td>
+							<td>{{profile.doctype}}</td>
+						 	<td class="bg-info">创建时间</td>
+							<td>{{profile.created}}</td>
+						</tr>
+					</table>
+					<table class="table table-bordered" style="word-break:break-all; word-wrap:break-all;">
+					    <tr ng-repeat="item in profile.items">
+							<td class="col-md-3 bg-info">{{item.name}}</td>
+							<td class="col-md-9">{{item.value}}</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			
+	</div>	
+</div>
+</div>

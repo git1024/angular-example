@@ -1,4 +1,4 @@
-var hrApp = angular.module('hrApp',['ui.router','ui.bootstrap','ngDialog','ngTip','tm.pagination','personModule','relationModule','profileModule','MyFilterModule']);
+var hrApp = angular.module('hrApp',['ui.router','ui.bootstrap','ngDialog','ngTip','tm.pagination','personModule','relationModule','profileModule','consultmrModule','MyFilterModule']);
 
 hrApp.run(function($rootScope,$state,$stateParams){
 	$rootScope.$state = $state;
@@ -48,6 +48,19 @@ hrApp.config(function($stateProvider, $urlRouterProvider){
 	                },
 	                'custGrid@list': {
 	                    templateUrl: 'tpls/profileGrid.html'
+	                }
+	           }
+	     }).state('consultmr', {
+	         url: '/consultmr',
+	         views: { //注意这里的写法，当一个页面上带有多个ui-view的时候如何进行命名和视图模板的加载动作
+	                '': {
+	                    templateUrl: 'tpls/list.html'
+	                },
+	                'tableSchema@consultmr': {
+	                    templateUrl: 'tpls/tableSchema.html'
+	                },
+	                'custGrid@consultmr': {
+	                    templateUrl: 'tpls/consultmrGrid.html'
 	                }
 	           }
 	     })

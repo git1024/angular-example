@@ -107,6 +107,7 @@ personModule.controller('personCtrl', function($scope,ngDialog,ngTip,$timeout,$h
     	  }
      };
 
+    
 });
  
 var relModule = angular.module("relationModule", []);
@@ -293,9 +294,97 @@ profileModule.controller('profileCtrl', function($scope,ngDialog,ngTip,$timeout,
     }
 });
 
+var consultmrModule = angular.module("consultmrModule", []);
+consultmrModule.controller('consultmrCtrl', function($scope,ngDialog,ngTip,$timeout,$http,$state,$stateParams) {
+	//修改菜单颜色
+    $('#tn_consultmr').addClass("active");
+    
+	$scope.cst = {
+		consultType:'1',
+		
+	};  
+	
+	$scope.columns = ['序号','hospitalid','visitid','userId','created','操作'];
+	//配置分页基本参数
+    $scope.paginationConf = {
+        currentPage: 1,
+        itemsPerPage: 10
+    };
+    $scope.submitConsultForm = function(isValid) {
+    	
+  	  if (!isValid) {
+  		  ngTip.tip('表单验证失败','danger');
+  		  return;
+  	  }
+		 var param = {
+	        		userId : $scope.cst.userId,
+	        		hospitalId : $scope.cst.hospitalId,
+	        		visitId : $scope.cst.visitId,
+	        		consultType : $scope.cst.consultType,
+	        		startDate : $scope.dat1,
+	        		endDate : $scope.dat2,
+	        		pageSize: $scope.paginationConf.itemsPerPage,
+	                curPage: $scope.paginationConf.currentPage
+	        		};
+	        console.info(param);
+	        $http.post("/nhc/findConsultMR",param).success(function(data){
+	        	console.info(data);
+	        	if(data.success){
+	        		var arr = data.result;
+	        		if(arr.length==0){
+	        			 $scope.multiData=false;
+		        		 $scope.singleData=false;
+		        		 
+	        		}else if(arr.length>1){
+		        		 $scope.multiData=true;
+		        		 $scope.singleData=false;
+		        		 $scope.paginationConf.totalItems = data.total;
+		                 $scope.items = data.result;
+		        	}else{
+		        		$scope.multiData=false;
+		        		$scope.singleData=true;
+		        		$scope.profile = arr[0];
+		        	}
+		        	
+	        	}else{
+	        		ngTip.tip(data.msg,'danger');
+	        	}
+	        });
+	}
+    $scope.showConsultMRInfo = function (val){
+    	console.info(val);
+        
+        $scope.entrys=val;
+        
+        ngDialog.open({
+       	    showClose: false,
+            template: 'tpls/detail.html',
+            className: 'ngdialog-theme-plain',
+            width: 650,
+            scope: $scope,
+            cache: false,
+            data:{isUpdate:false,title:'详情'}
+        });
+    }
+    
+    ////日期控件
+    //$scope.dat = new Date();
+    $scope.format = "yyyy-MM-dd";
+    $scope.altInputFormats = ['yyyy/M!/d!'];
 
-
-
+    $scope.popup1 = {
+        opened: false
+    };
+    $scope.open1 = function () {
+        $scope.popup1.opened = true;
+    };
+    $scope.popup2 = {
+            opened: false
+        };
+        $scope.open2 = function () {
+            $scope.popup2.opened = true;
+        };
+});
 
 
 
