@@ -13,7 +13,7 @@
 			   <label for="name">用户来源</label>
 			   </div>
 			   <div class="col-sm-10">
-			   <input ng-model="vm.user.orgCode" required class="form-control input-sm" id="orgCode" name="orgCode" type="text"  placeholder="必填项"/>
+			   <input ng-model="vm.user.orgCode" required class="form-control input-sm" id="orgCode" name="orgCode" type="text" ng-pattern="/^PAJK_\w*$/" placeholder="PAJK_开头,必填项"/>
 			  		<span ng-show="myForm.orgCode.$dirty && myForm.orgCode.$valid" class="glyphicon glyphicon-ok form-control-feedback"></span>
 			  		<span ng-show="myForm.orgCode.$invalid && !myForm.orgCode.$pristine" class="glyphicon glyphicon-remove form-control-feedback"></span>
 			   </div>
